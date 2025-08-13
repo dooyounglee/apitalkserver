@@ -13,8 +13,8 @@ namespace rest1.Services
     {
         //public Room getChat(int roomNo);
         public List<Room> getChatList(int usrNo);
-        //public int InsertChat(int roomNo, int usrNo, string type, string msg);
-        //public int InsertChat(int roomNo, int usrNo, string type, File file);
+        public int InsertChat(int roomNo, int usrNo, string type, string msg);
+        public int InsertChat(int roomNo, int usrNo, string type, Models.File file);
         //public List<Chat> SelectChats(int roomNo);
         //public List<Chat> SelectChats(int roomNo, int page);
         //public int CountChats(int roomNo);
@@ -25,19 +25,19 @@ namespace rest1.Services
         //public int CountRoomWithMe(int usrNo);
         //public bool IsThereSomeoneinRoom(int roomNo, List<User> userList);
         //public void EditTitle(int roomNo, int usrNo, string title);
-        //public void ReadChat(int roomNo, int usrNo);
+        public int ReadChat(int roomNo, int usrNo);
     }
 
     public class ChatService : IChatService
     {
         private readonly IChatRepository? _chatRepository;
-        //private readonly IUserService _userService;
+        private readonly IUserService _userService;
         private readonly IFileService _fileService;
 
-        public ChatService(IChatRepository? chatRepository/*, IUserService userService*/, IFileService fileService)
+        public ChatService(IChatRepository? chatRepository, IUserService userService, IFileService fileService)
         {
             _chatRepository = chatRepository;
-            //_userService = userService;
+            _userService = userService;
             _fileService = fileService;
         }
 
@@ -51,23 +51,23 @@ namespace rest1.Services
             return _chatRepository.GetRoomList(usrNo);
         }
 
-        //public int InsertChat(int roomNo, int usrNo, string type, string msg)
-        //{
-        //    int newChatNo = _chatRepository.getNewChatNo();
-        //    _chatRepository.InsertChat(newChatNo, roomNo, usrNo, type, msg);
-        //    _chatRepository.InsertChatUserExceptMe(roomNo, _userService.Me.UsrNo, newChatNo);
-        //    return newChatNo;
-        //}
+        public int InsertChat(int roomNo, int usrNo, string type, string msg)
+        {
+            int newChatNo = _chatRepository.getNewChatNo();
+            _chatRepository.InsertChat(newChatNo, roomNo, usrNo, type, msg);
+            _chatRepository.InsertChatUserExceptMe(roomNo, _userService.Me.UsrNo, newChatNo);
+            return newChatNo;
+        }
 
-        //public int InsertChat(int roomNo, int usrNo, string type, File file)
-        //{
-        //    int fileNo = _fileService.saveFile(file);
+        public int InsertChat(int roomNo, int usrNo, string type, Models.File file)
+        {
+            int fileNo = _fileService.saveFile(file);
 
-        //    int newChatNo = _chatRepository.getNewChatNo();
-        //    _chatRepository.InsertChat(newChatNo, roomNo, usrNo, type, file.OriginName, fileNo);
-        //    _chatRepository.InsertChatUserExceptMe(roomNo, _userService.Me.UsrNo, newChatNo);
-        //    return newChatNo;
-        //}
+            int newChatNo = _chatRepository.getNewChatNo();
+            _chatRepository.InsertChat(newChatNo, roomNo, usrNo, type, file.OriginName, fileNo);
+            _chatRepository.InsertChatUserExceptMe(roomNo, _userService.Me.UsrNo, newChatNo);
+            return newChatNo;
+        }
 
         //public List<Chat> SelectChats(int roomNo)
         //{
@@ -185,9 +185,9 @@ namespace rest1.Services
         //    _chatRepository.UpdateTitle(roomNo, usrNo, title);
         //}
 
-        //public void ReadChat(int roomNo, int usrNo)
-        //{
-        //    _chatRepository.ReadChat(roomNo, usrNo);
-        //}
+        public int ReadChat(int roomNo, int usrNo)
+        {
+            return _chatRepository.ReadChat(roomNo, usrNo);
+        }
     }
 }

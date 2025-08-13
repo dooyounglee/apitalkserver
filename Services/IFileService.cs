@@ -10,7 +10,7 @@ namespace rest1.Services
 {
     public interface IFileService
     {
-        //public int saveFile(File file);
+        public int saveFile(Models.File file);
     }
 
     public class FileService : IFileService
@@ -22,12 +22,12 @@ namespace rest1.Services
             _fileRepository = fileRepository;
         }
 
-        //public int saveFile(File file)
-        //{
-        //    int fileNo = _fileRepository.GetNewFileNo();
-        //    file.FileNo = fileNo;
-        //    _fileRepository.saveFile(file);
-        //    return fileNo;
-        //}
+        public int saveFile(Models.File file)
+        {
+            int fileNo = _fileRepository.GetNewFileNo();
+            file.FileNo = fileNo;
+            _fileRepository.saveFile(file);
+            return fileNo;
+        }
     }
 }

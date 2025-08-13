@@ -21,9 +21,9 @@ namespace rest1.Repositories
         //public void AddRoomUser(Room room);
         //public void LeaveRoom(int roomNo, int usrNo);
         //public void UpdateTitle(int? roomNo, int usrNo, string title);
-        //public int getNewChatNo();
-        //public void InsertChat(int newChatNo, int roomNo, int usrNo, string type, string msg);
-        //public void InsertChat(int newChatNo, int roomNo, int usrNo, string type, string msg, int fileNo);
+        public int getNewChatNo();
+        public void InsertChat(int newChatNo, int roomNo, int usrNo, string type, string msg);
+        public void InsertChat(int newChatNo, int roomNo, int usrNo, string type, string msg, int fileNo);
         //public List<Chat> SelectChats(int roomNo, int usrNo);
         //public List<Chat> SelectChats(int roomNo, int usrNo, int page);
         //public int CountChats(int roomNo);
@@ -31,8 +31,8 @@ namespace rest1.Repositories
         //public int CountRoomWithMe(int myUsrNo, int usrNo);
         //public int CountHeinRoom(int roomNo, int usrNo);
         //public int UpdateTitle(int roomNo, int usrNo, string title);
-        //public void InsertChatUserExceptMe(int roomNo, int myUsrNo, int chatNo);
-        //public void ReadChat(int roomNo, int usrNo);
+        public int InsertChatUserExceptMe(int roomNo, int myUsrNo, int chatNo);
+        public int ReadChat(int roomNo, int usrNo);
     }
 
     internal class ChatRepository : IChatRepository

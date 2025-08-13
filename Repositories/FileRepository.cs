@@ -13,7 +13,7 @@ namespace rest1.Repositories
     public interface IFileRepository
     {
         int GetNewFileNo();
-        //void saveFile(File file);
+        int saveFile(Models.File file);
     }
 
     public class FileRepository : IFileRepository
