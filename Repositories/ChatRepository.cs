@@ -18,7 +18,7 @@ namespace rest1.Repositories
         public List<Room>? GetRoomList(int usrNo);
         //public int GetRoomNo();
         //public void AddRoom(Room room);
-        //public void AddRoomUser(Room room);
+        public void AddRoomUser(Room room);
         //public void LeaveRoom(int roomNo, int usrNo);
         //public void UpdateTitle(int? roomNo, int usrNo, string title);
         public int getNewChatNo();
@@ -29,7 +29,7 @@ namespace rest1.Repositories
         //public int CountChats(int roomNo);
         //public List<User> SelectRoomUserList(int roomNo);
         //public int CountRoomWithMe(int myUsrNo, int usrNo);
-        //public int CountHeinRoom(int roomNo, int usrNo);
+        public int CountHeinRoom(int roomNo, int usrNo);
         //public int UpdateTitle(int roomNo, int usrNo, string title);
         public int InsertChatUserExceptMe(int roomNo, int myUsrNo, int chatNo);
         public int ReadChat(int roomNo, int usrNo);

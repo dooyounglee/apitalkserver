@@ -11,9 +11,9 @@ namespace rest1.Services
 
     public class RoomService : IRoomService
     {
-        private readonly IRoomRespository _roomRepository;
+        private readonly IRoomRepository _roomRepository;
 
-        public RoomService(IRoomRespository roomRepository)
+        public RoomService(IRoomRepository roomRepository)
         {
             _roomRepository = roomRepository;
         }

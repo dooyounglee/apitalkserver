@@ -10,16 +10,16 @@ namespace rest1.Controllers
     public class HomeController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly RoomRepository _roomRepository;
+        // private readonly RoomRepository _roomRepository;
 
         private readonly DbHelper _db;
 
-        public HomeController(AppDbContext context, RoomRepository roomRepository, DbHelper db)
-        {
-            _context = context;
-            _roomRepository = roomRepository;
-            _db = db;
-        }
+        // public HomeController(AppDbContext context, RoomRepository roomRepository, DbHelper db)
+        // {
+        //     _context = context;
+        //     _roomRepository = roomRepository;
+        //     _db = db;
+        // }
 
         //[HttpPost("hello")]
         //public async Task<IActionResult> Index([FromBody] MyRequest request)

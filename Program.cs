@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using rest1.Controllers;
 using rest1.Repositories;
 using rest1.Services;
+using System.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,15 +22,17 @@ builder.Services.AddSingleton<DbHelper>(); // 의존성 주입
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddScoped<RoomRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IChatService, ChatService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IChatRepository, ChatRepository>();
 builder.Services.AddScoped<IFileRepository, FileRepository>();
 
 var app = builder.Build();
+var logger = app.Logger;
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -38,6 +42,16 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRouting();
+
+app.Use(async (context, next) =>
+{
+    // Console.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+    Debug.WriteLine($"Request: {context.Request.Method} {context.Request.Path}");
+    // logger.LogInformation($"Request: {context.Request.Method} {context.Request.Path}");
+    await next.Invoke();
+});
 
 app.UseAuthorization();
 

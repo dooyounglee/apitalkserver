@@ -5,13 +5,13 @@ using System.Data;
 
 namespace rest1.Repositories
 {
-    public interface IRoomRespository
+    public interface IRoomRepository
     {
         Room getRoom(int roomNo, int usrNo);
         List<Room> getRoomList(int usrNo);
     }
 
-    public class RoomRepository : IRoomRespository
+    public class RoomRepository : IRoomRepository
     {
         private readonly DbHelper _db;
 

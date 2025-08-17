@@ -19,11 +19,12 @@ namespace rest1.Services
         //public List<Chat> SelectChats(int roomNo, int page);
         //public int CountChats(int roomNo);
         //public int CreateRoom(List<User> userList);
-        //public string Invite(int roomNo, List<User> userList);
+        public string Invite(int roomNo, List<User> userList);
+        public string Invite(int roomNo, List<int> usrNos, string usrNms);
         //public string Leave(int roomNo, int usrNo);
         //public List<User> RoomUserList(int roomNo);
         //public int CountRoomWithMe(int usrNo);
-        //public bool IsThereSomeoneinRoom(int roomNo, List<User> userList);
+        public bool IsThereSomeoneinRoom(int roomNo, List<int> usrNos);
         //public void EditTitle(int roomNo, int usrNo, string title);
         public int ReadChat(int roomNo, int usrNo);
     }
@@ -122,27 +123,46 @@ namespace rest1.Services
         //    return newRoomNo;
         //}
 
-        //public string Invite(int roomNo, List<User> userList)
-        //{
-        //    string invitedUsers = string.Join(",", userList.Select(u => u.UsrNm));
+        public string Invite(int roomNo, List<User> userList)
+        {
+            string invitedUsers = string.Join(",", userList.Select(u => u.UsrNm));
 
-        //    // 방-유저 연결하기
-        //    foreach (User user in userList)
-        //    {
-        //        _chatRepository.AddRoomUser(new Room()
-        //        {
-        //            RoomNo = roomNo,
-        //            UsrNo = user.UsrNo,
-        //            Title = $"{_userService.Me.UsrNm},{invitedUsers}",
-        //        });
-        //    }
+            // 방-유저 연결하기
+            foreach (User user in userList)
+            {
+                _chatRepository.AddRoomUser(new Room()
+                {
+                    RoomNo = roomNo,
+                    UsrNo = user.UsrNo,
+                    Title = $"{_userService.Me.UsrNm},{invitedUsers}",
+                });
+            }
 
-        //    var msg = $"{_userService.Me.UsrNm}님이 {invitedUsers}님을 초대했다";
+            var msg = $"{_userService.Me.UsrNm}님이 {invitedUsers}님을 초대했다";
 
-        //    InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
+            InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
 
-        //    return msg;
-        //}
+            return msg;
+        }
+        public string Invite(int roomNo, List<int> usrNos, string usrNms)
+        {
+            // 방-유저 연결하기
+            foreach (int usrNo in usrNos)
+            {
+                _chatRepository.AddRoomUser(new Room()
+                {
+                    RoomNo = roomNo,
+                    UsrNo = usrNo,
+                    Title = $"{_userService.Me.UsrNm},{usrNms}",
+                });
+            }
+
+            var msg = $"{_userService.Me.UsrNm}님이 {usrNms}님을 초대했다";
+
+            InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
+
+            return msg;
+        }
 
         //public string Leave(int roomNo, int usrNo)
         //{
@@ -165,20 +185,20 @@ namespace rest1.Services
         //    return _chatRepository.CountRoomWithMe(_userService.Me.UsrNo, usrNo);
         //}
 
-        //public bool IsThereSomeoneinRoom(int roomNo, List<User> userList)
-        //{
-        //    bool result = false;
-        //    foreach(var u in userList)
-        //    {
-        //        int countHeinRoom = _chatRepository.CountHeinRoom(roomNo, u.UsrNo);
-        //        if (countHeinRoom > 0)
-        //        {
-        //            result = true;
-        //            break;
-        //        }
-        //    }
-        //    return result;
-        //}
+        public bool IsThereSomeoneinRoom(int roomNo, List<int> usrNos)
+        {
+            bool result = false;
+            foreach(var usrNo in usrNos)
+            {
+                int countHeinRoom = _chatRepository.CountHeinRoom(roomNo, usrNo);
+                if (countHeinRoom > 0)
+                {
+                    result = true;
+                    break;
+                }
+            }
+            return result;
+        }
 
         //public void EditTitle(int roomNo, int usrNo, string title)
         //{

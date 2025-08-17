@@ -30,9 +30,9 @@ namespace rest1.Controllers
         }
 
         [HttpPost("insert")]
-        public async Task<IActionResult> insertChat([FromBody] int roomNo, [FromBody] int usrNo, [FromBody] string type, [FromBody] string msg)
+        public async Task<IActionResult> insertChat([FromBody] RequestDto dto)
         {
-            var result = _chatService.InsertChat(roomNo, usrNo, type, msg);
+            var result = _chatService.InsertChat(dto.roomNo, dto.usrNo, dto.type, dto.msg);
             return Ok(result);
         }
 
@@ -51,6 +51,22 @@ namespace rest1.Controllers
                 Buffer = memoryStream.ToArray(),
             };
             var result = _chatService.InsertChat(roomNo, usrNo, type, f);
+            return Ok(result);
+        }
+
+        [HttpGet("isThereTheyinRoom")]
+        public async Task<IActionResult> isThereTheyinRoom(int roomNo, [FromQuery] string usrNos)
+        {
+            List<int> usrNoList = usrNos.Split(",").Select(x => int.Parse(x)).ToList();
+            var result = _chatService.IsThereSomeoneinRoom(roomNo, usrNoList);
+            return Ok(result);
+        }
+
+        [HttpGet("invite/{roomNo}")]
+        public async Task<IActionResult> invite(int roomNo, [FromQuery] string usrNos, [FromQuery] string usrNms)
+        {
+            List<int> usrNoList = usrNos.Split(",").Select(x => int.Parse(x)).ToList();
+            var result = _chatService.Invite(roomNo, usrNoList, usrNms);
             return Ok(result);
         }
 
