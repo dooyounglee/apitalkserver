@@ -12,11 +12,11 @@ namespace rest1.Services
     public interface IChatService
     {
         //public Room getChat(int roomNo);
-        public List<Room> getChatList(int usrNo);
+        // public List<Room> getChatList(int usrNo);
         public int InsertChat(int roomNo, int usrNo, string type, string msg);
         public int InsertChat(int roomNo, int usrNo, string type, Models.File file);
         //public List<Chat> SelectChats(int roomNo);
-        //public List<Chat> SelectChats(int roomNo, int page);
+        public List<Chat> getChatList(int roomNo, int usrNo, int page);
         //public int CountChats(int roomNo);
         //public int CreateRoom(List<User> userList);
         public string Invite(int roomNo, List<User> userList);
@@ -47,9 +47,15 @@ namespace rest1.Services
         //    return _chatRepository.GetRoom(roomNo, _userService.Me.UsrNo);
         //}
 
-        public List<Room> getChatList(int usrNo)
+        public List<Chat> getChatList(int roomNo, int usrNo, int page)
         {
-            return _chatRepository.GetRoomList(usrNo);
+            if (page == 0)
+            {
+                return _chatRepository.getChatList(roomNo, usrNo);
+            } else
+            {
+                return _chatRepository.getChatList(roomNo, usrNo, page);
+            }
         }
 
         public int InsertChat(int roomNo, int usrNo, string type, string msg)

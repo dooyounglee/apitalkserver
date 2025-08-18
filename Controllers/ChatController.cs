@@ -5,7 +5,7 @@ using talkLib.Util;
 namespace rest1.Controllers
 {
     [ApiController]
-    [Route("api/v1/chat/[controller]")]
+    [Route("api/v1/chat")]
     public class ChatController : Controller
     {
         private readonly IChatService _chatService;
@@ -16,9 +16,9 @@ namespace rest1.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> getChatList([FromBody] RequestDto dto)
+        public async Task<IActionResult> getChatList([FromQuery] int roomNo, [FromQuery] int usrNo, [FromQuery] int page)
         {
-            var chatList = _chatService.getChatList(dto.usrNo);
+            var chatList = _chatService.getChatList(roomNo, usrNo, page);
             return Ok(chatList);
         }
 

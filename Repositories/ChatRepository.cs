@@ -15,7 +15,8 @@ namespace rest1.Repositories
     public interface IChatRepository
     {
         //public Room GetRoom(int roomNo, int usrNo);
-        public List<Room>? GetRoomList(int usrNo);
+        public List<Chat>? getChatList(int roomNo, int usrNo);
+        public List<Chat>? getChatList(int roomNo, int usrNo, int page);
         //public int GetRoomNo();
         //public void AddRoom(Room room);
         public void AddRoomUser(Room room);
@@ -56,10 +57,10 @@ namespace rest1.Repositories
                                and a.room_no = @roomNo
                                and b.usr_no = @usrNo
                                and b.del_yn = 'N'";
-            var param = new Dictionary<string, object>
+            var param = new
             {
-                { "roomNo", roomNo },
-                { "usrNo", usrNo },
+                roomNo = roomNo ,
+                usrNo = usrNo ,
             };
 
             var dt = _db.ExecuteSelect(sql, param);
@@ -73,51 +74,88 @@ namespace rest1.Repositories
             return roomlist.ToList<Room>()[0];
         }
 
-        public List<Room>? GetRoomList(int usrNo)
+        public List<Chat> getChatList(int roomNo, int usrNo)
         {
-            string sql = @"SELECT a.room_no
-                                 , b.title
-                                 , c.chat
-                                 , coalesce(c.rgt_dtm, a.rgt_dtm) as rgt_dtm
-                                 , (SELECT COUNT(*)
-                                      FROM talk.chatuser
-                                     WHERE ROOM_NO = a.room_no
-                                       AND USR_NO = b.usr_no) as cnt_unread
-                              FROM talk.room a
-                             inner join talk.roomuser b on (a.room_no = b.room_no)
-                              left join (select room_no
-                                              , chat
-                                              , rgt_dtm
-                                           from talk.chat
-                                          where (room_no, chat_no) in (select room_no, max(chat_no) as chat_no
-                                                                         from talk.chat
-                                                                        group by room_no)
-                                        ) c
-                                on (a.room_no = c.room_no)
-                             where b.usr_no = @usrNo
-                               and b.del_yn = 'N'
-                             order by rgt_dtm desc";
-
-            var param = new Dictionary<string, object>
+            string sql = @"SELECT a.chat_no
+                                 , a.chat
+                                 , a.usr_no
+                                 , a.chat_fg
+                                 , coalesce(a.file_no, 0) as file_no
+                              FROM talk.chat a
+                             where a.room_no = @roomNo
+                               and a.chat_no > (select chat_no
+                                                  from talk.roomuser
+                                                 where room_no = @roomNo
+                                                   and usr_no = @usrNo
+                                                   and del_yn = 'N')
+                             order by chat_no desc
+                             limit 10";
+            var param = new
             {
-                { "usrNo", 1 },
+                roomNo = roomNo,
+                usrNo = usrNo,
             };
 
             var dt = _db.ExecuteSelect(sql, param);
 
-            // if (dt == null)
-                // return StatusCode(500, "DB 조회 실패");
-
-            var roomlist = dt.AsEnumerable().Select(row => new Room()
+            var chats = new List<Chat>();
+            for (var i = 0; i < dt.Rows.Count; i++)
             {
-                RoomNo = (int)(long)row["room_no"],
-                Title = (string)row["title"],
-                Chat = (string)row["chat"],
-                RgtDtm = (string)row["rgt_dtm"],
-                CntUnread = (int)(long)row["cnt_unread"]
-            });
+                chats.Add(new Chat()
+                {
+                    ChatNo = (int)(long)dt.Rows[i]["chat_no"],
+                    UsrNo = (int)(long)dt.Rows[i]["usr_no"],
+                    chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
+                    ChatFg = (string)dt.Rows[i]["chat_fg"],
+                    FileNo = (int)(long)dt.Rows[i]["file_no"],
+                });
+            };
 
-            return roomlist.ToList<Room>();
+            return chats;
+        }
+
+        public List<Chat> getChatList(int roomNo, int usrNo, int page)
+        {
+            string sql = @"SELECT * FROM (
+                        SELECT ROW_NUMBER() OVER(ORDER BY a.chat_no desc) as rownum
+                                 , a.chat_no
+                                 , a.chat
+                                 , a.usr_no
+                                 , a.chat_fg
+                              FROM talk.chat a
+                             where a.room_no = @roomNo
+                               and a.chat_no > (select chat_no
+                                                  from talk.roomuser
+                                                 where room_no = @roomNo
+                                                   and usr_no = @usrNo
+                                                   and del_yn = 'N')
+                             order by chat_no desc
+                        )
+                     WHERE rownum between @from and @to";
+            var param = new
+            {
+                roomNo = roomNo,
+                usrNo = usrNo,
+                from = (page - 1) * pageSize + 1,
+                to = page * pageSize,
+            };
+
+            var dt = _db.ExecuteSelect(sql, param);
+
+            var chats = new List<Chat>();
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                chats.Add(new Chat()
+                {
+                    ChatNo = (int)(long)dt.Rows[i]["chat_no"],
+                    UsrNo = (int)(long)dt.Rows[i]["usr_no"],
+                    chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
+                    ChatFg = (string)dt.Rows[i]["chat_fg"],
+                });
+            }
+            ;
+
+            return chats;
         }
 
         public int GetRoomNo()
@@ -250,88 +288,6 @@ namespace rest1.Repositories
             int result = _db.ExecuteNonQuery(sql, param);
         }
 
-        public List<Chat> SelectChats(int roomNo, int usrNo)
-        {
-            string sql = @"SELECT a.chat_no
-                                 , a.chat
-                                 , a.usr_no
-                                 , a.chat_fg
-                                 , coalesce(a.file_no, 0) as file_no
-                              FROM talk.chat a
-                             where a.room_no = {roomNo}
-                               and a.chat_no > (select chat_no
-                                                  from talk.roomuser
-                                                 where room_no = {roomNo}
-                                                   and usr_no = {usrNo}
-                                                   and del_yn = 'N')
-                             order by chat_no desc
-                             limit 10";
-            var param = new Dictionary<string, object>
-            {
-                { "usrNo", 1 },
-            };
-
-            var dt = _db.ExecuteSelect(sql, param);
-
-            var chats = new List<Chat>();
-            for (var i = 0; i < dt.Rows.Count; i++)
-            {
-                chats.Add(new Chat()
-                {
-                    ChatNo = (int)(long)dt.Rows[i]["chat_no"],
-                    UsrNo = (int)(long)dt.Rows[i]["usr_no"],
-                    chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
-                    ChatFg = (string)dt.Rows[i]["chat_fg"],
-                    FileNo = (int)(long)dt.Rows[i]["file_no"],
-                });
-            };
-
-            return chats;
-        }
-
-        public List<Chat> SelectChats(int roomNo, int usrNo, int page)
-        {
-            string sql = @"SELECT * FROM (
-                        SELECT ROW_NUMBER() OVER(ORDER BY a.chat_no desc) as rownum
-                                 , a.chat_no
-                                 , a.chat
-                                 , a.usr_no
-                                 , a.chat_fg
-                              FROM talk.chat a
-                             where a.room_no = @roomNo
-                               and a.chat_no > (select chat_no
-                                                  from talk.roomuser
-                                                 where room_no = @roomNo
-                                                   and usr_no = @usrNo
-                                                   and del_yn = 'N')
-                             order by chat_no desc
-                        )
-                     WHERE rownum between @from and @to";
-            var param = new
-            {
-                roomNo = roomNo,
-                usrNo = usrNo,
-                from = (page - 1) * pageSize + 1,
-                to = page * pageSize,
-            };
-
-            var dt = _db.ExecuteSelect(sql, param);
-
-            var chats = new List<Chat>();
-            for (var i = 0; i < dt.Rows.Count; i++)
-            {
-                chats.Add(new Chat()
-                {
-                    ChatNo = (int)(long)dt.Rows[i]["chat_no"],
-                    UsrNo = (int)(long)dt.Rows[i]["usr_no"],
-                    chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
-                    ChatFg = (string)dt.Rows[i]["chat_fg"],
-                });
-            }
-            ;
-
-            return chats;
-        }
 
         public int CountChats(int roomNo)
         {
