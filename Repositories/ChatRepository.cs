@@ -27,7 +27,7 @@ namespace rest1.Repositories
         public void InsertChat(int newChatNo, int roomNo, int usrNo, string type, string msg, int fileNo);
         //public List<Chat> SelectChats(int roomNo, int usrNo);
         //public List<Chat> SelectChats(int roomNo, int usrNo, int page);
-        //public int CountChats(int roomNo);
+        public int CountChats(int roomNo);
         //public List<User> SelectRoomUserList(int roomNo);
         //public int CountRoomWithMe(int myUsrNo, int usrNo);
         public int CountHeinRoom(int roomNo, int usrNo);

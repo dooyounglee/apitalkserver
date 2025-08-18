@@ -22,6 +22,13 @@ namespace rest1.Controllers
             return Ok(chatList);
         }
 
+        [HttpGet("count/{roomNo}")]
+        public async Task<IActionResult> CountChats(int roomNo)
+        {
+            var result = _chatService.CountChats(roomNo);
+            return Ok(result);
+        }
+
         [HttpGet("read/{roomNo}")]
         public async Task<IActionResult> readChat(int roomNo, [FromQuery] int usrNo)
         {

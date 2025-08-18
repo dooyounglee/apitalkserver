@@ -17,7 +17,7 @@ namespace rest1.Services
         public int InsertChat(int roomNo, int usrNo, string type, Models.File file);
         //public List<Chat> SelectChats(int roomNo);
         public List<Chat> getChatList(int roomNo, int usrNo, int page);
-        //public int CountChats(int roomNo);
+        public int CountChats(int roomNo);
         //public int CreateRoom(List<User> userList);
         public string Invite(int roomNo, List<User> userList);
         public string Invite(int roomNo, List<int> usrNos, string usrNms);
@@ -84,10 +84,10 @@ namespace rest1.Services
         //{
         //    return _chatRepository.SelectChats(roomNo, _userService.Me.UsrNo, page);
         //}
-        //public int CountChats(int roomNo)
-        //{
-        //    return _chatRepository.CountChats(roomNo);
-        //}
+        public int CountChats(int roomNo)
+        {
+            return _chatRepository.CountChats(roomNo);
+        }
 
         //public int CreateRoom(List<User> userList)
         //{
