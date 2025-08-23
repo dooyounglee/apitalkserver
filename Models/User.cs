@@ -10,16 +10,16 @@ namespace rest1.Models
     public class User
     {
         public int UsrNo { get; set; }
-        public string UsrId { get; set; }
-        public string UsrNm { get; set; }
+        public string? UsrId { get; set; }
+        public string? UsrNm { get; set; }
         public byte[]? Password { get; set; }
         public string? Password1 { get; set; }
         public int DivNo { get; set; }
-        public string DivNm { get; set; }
-        public string Phone { get; set; }
-        public string Level { get; set; }
-        public string Tel { get; set; }
-        public string Ip { get; set; }
+        public string? DivNm { get; set; }
+        public string? Phone { get; set; }
+        public string? Level { get; set; }
+        public string? Tel { get; set; }
+        public string? Ip { get; set; }
         public int Port { get; set; }
         // public ConnState ConnState { get; set; }
         public Boolean IsAdmin { get; set; } = false;
