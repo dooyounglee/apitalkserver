@@ -14,6 +14,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention());
 
+DbTransactionManager.Initialize(connectionString);
+
 // Add services to the container.
 
 builder.Services.AddControllers();
