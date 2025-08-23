@@ -1,4 +1,5 @@
 ﻿using Npgsql;
+using OTILib.Util;
 using System.Data;
 
 namespace rest1.Controllers
@@ -12,13 +13,26 @@ namespace rest1.Controllers
             _connStr = config.GetConnectionString("DefaultConnection");
         }
 
+        private NpgsqlConnection GetConnection()
+        {
+            return DbTransactionManager.Connection ?? new NpgsqlConnection(_connStr);
+        }
+
+        private NpgsqlTransaction? GetTransaction()
+        {
+            return DbTransactionManager.Current;
+        }
+
         public DataTable? ExecuteSelect(string sql, Dictionary<string, object>? parameters = null)
         {
-            using var conn = new NpgsqlConnection(_connStr);
+            var useTransaction = DbTransactionManager.Connection != null;
+            using var conn = useTransaction ? null : new NpgsqlConnection(_connStr);
+            var connection = conn ?? DbTransactionManager.Connection!;
             try
             {
-                conn.Open();
-                using var cmd = new NpgsqlCommand(sql, conn);
+                if (!useTransaction) conn.Open();
+                using var cmd = new NpgsqlCommand(sql, connection);
+                if (GetTransaction() != null) cmd.Transaction = GetTransaction();
 
                 if (parameters != null)
                 {
@@ -35,16 +49,23 @@ namespace rest1.Controllers
             {
                 Console.WriteLine(ex);
                 return null;
+            }
+            finally
+            {
+                if (!useTransaction) connection.Close();
             }
         }
 
         public DataTable? ExecuteSelect(string sql, object? parameters = null)
         {
-            using var conn = new NpgsqlConnection(_connStr);
+            var useTransaction = DbTransactionManager.Connection != null;
+            using var conn = useTransaction ? null : new NpgsqlConnection(_connStr);
+            var connection = conn ?? DbTransactionManager.Connection!;
             try
             {
-                conn.Open();
-                using var cmd = new NpgsqlCommand(sql, conn);
+                if (!useTransaction) conn.Open();
+                using var cmd = new NpgsqlCommand(sql, connection);
+                if (GetTransaction() != null) cmd.Transaction = GetTransaction();
 
                 if (parameters != null)
                 {
@@ -67,15 +88,22 @@ namespace rest1.Controllers
                 Console.WriteLine(ex);
                 return null;
             }
+            finally
+            {
+                if (!useTransaction) connection.Close();
+            }
         }
 
         public int ExecuteNonQuery(string sql, Dictionary<string, object>? parameters = null)
         {
-            using var conn = new NpgsqlConnection(_connStr);
+            var useTransaction = DbTransactionManager.Connection != null;
+            using var conn = useTransaction ? null : new NpgsqlConnection(_connStr);
+            var connection = conn ?? DbTransactionManager.Connection!;
             try
             {
-                conn.Open();
-                using var cmd = new NpgsqlCommand(sql, conn);
+                if (!useTransaction) conn.Open();
+                using var cmd = new NpgsqlCommand(sql, connection);
+                if (GetTransaction() != null) cmd.Transaction = GetTransaction();
 
                 if (parameters != null)
                 {
@@ -90,15 +118,22 @@ namespace rest1.Controllers
                 Console.WriteLine(ex);
                 return -1;
             }
+            finally
+            {
+                if (!useTransaction) connection.Close();
+            }
         }
 
         public int ExecuteNonQuery(string sql, object? parameters = null)
         {
-            using var conn = new NpgsqlConnection(_connStr);
+            var useTransaction = DbTransactionManager.Connection != null;
+            using var conn = useTransaction ? null : new NpgsqlConnection(_connStr);
+            var connection = conn ?? DbTransactionManager.Connection!;
             try
             {
-                conn.Open();
-                using var cmd = new NpgsqlCommand(sql, conn);
+                if (!useTransaction) conn.Open();
+                using var cmd = new NpgsqlCommand(sql, connection);
+                if (GetTransaction() != null) cmd.Transaction = GetTransaction();
 
                 if (parameters != null)
                 {
@@ -116,7 +151,12 @@ namespace rest1.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex);
+                OtiLogger.log1(ex);
                 return -1;
+            }
+            finally
+            {
+                if (!useTransaction) connection.Close();
             }
         }
     }
