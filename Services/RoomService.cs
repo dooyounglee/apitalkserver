@@ -9,6 +9,8 @@ namespace rest1.Services
         Room getRoom(int roomNo, int usrNo);
         List<Room> getRoomList(int usrNo);
         int createRoom(List<User> userList, User me);
+        int EditTitle(int roomNo, int usrNo, string title);
+        string Leave(int roomNo, int usrNo, string msg);
     }
 
     public class RoomService : IRoomService
@@ -73,6 +75,20 @@ namespace rest1.Services
             throw new Exception("일부러");
             
             return newRoomNo;
+        }
+
+        public int EditTitle(int roomNo, int usrNo, string title)
+        {
+            return _roomRepository.UpdateTitle(roomNo, usrNo, title);
+        }
+
+        public string Leave(int roomNo, int usrNo, string msg)
+        {
+            _roomRepository.LeaveRoom(roomNo, usrNo);
+
+            _chatService.InsertChat(roomNo, usrNo, "D", usrNo, msg);
+
+            return msg;
         }
     }
 }

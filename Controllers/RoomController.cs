@@ -38,11 +38,39 @@ namespace rest1.Controllers
             var roomNo = _roomService.createRoom(dto.userList, dto.me);
             return Ok(roomNo);
         }
+
+        [HttpPut("title")]
+        public async Task<IActionResult> putTitle([FromBody] PutTitleDto dto)
+        {
+            var result = _roomService.EditTitle(dto.roomNo, dto.usrNo, dto.title);
+            return Ok(result);
+        }
+
+        [HttpPost("leave")]
+        public async Task<IActionResult> postLeave([FromBody] PostLeaveDto dto)
+        {
+            var result = _roomService.Leave(dto.roomNo, dto.usrNo, dto.msg);
+            return Ok(result);
+        }
     }
 
     public class CreateRoomDto
     {
         public List<User> userList { get; set; }
         public User me { get; set; }
+    }
+
+    public class PutTitleDto
+    {
+        public int roomNo { get; set; }
+        public int usrNo { get; set; }
+        public string title { get; set; }
+    }
+
+    public class PostLeaveDto
+    {
+        public int roomNo { get; set; }
+        public int usrNo { get; set; }
+        public string msg { get; set; }
     }
 }

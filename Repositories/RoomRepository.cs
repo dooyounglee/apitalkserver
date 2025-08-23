@@ -12,6 +12,8 @@ namespace rest1.Repositories
         int getRoomNo();
         void AddRoom(Room room);
         void AddRoomUser(Room room);
+        int UpdateTitle(int roomNo, int usrNo, string title);
+        int LeaveRoom(int roomNo, int usrNo);
     }
 
     public class RoomRepository : IRoomRepository
@@ -138,6 +140,39 @@ namespace rest1.Repositories
             };
 
             int result = _db.ExecuteNonQuery(sql, param);
+        }
+
+        public int UpdateTitle(int roomNo, int usrNo, string title)
+        {
+            string sql = @"UPDATE talk.roomuser
+                               SET TITLE = @title
+                             WHERE ROOM_NO = @roomNo
+                               AND USR_NO = @usrNo
+                               AND DEL_YN = 'N'";
+            var param = new
+            {
+                title = title,
+                roomNo = roomNo,
+                usrNo = usrNo,
+            };
+
+            return _db.ExecuteNonQuery(sql, param);
+        }
+
+        public int LeaveRoom(int roomNo, int usrNo)
+        {
+            string sql = @$"UPDATE talk.roomuser
+                               SET DEL_YN = 'Y'
+                             WHERE ROOM_NO = @roomNo
+                               AND USR_NO = @usrNo"
+                         ;
+            var param = new
+            {
+                roomNo = roomNo,
+                usrNo = usrNo,
+            };
+
+            return _db.ExecuteNonQuery(sql, param);
         }
     }
 }
