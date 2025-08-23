@@ -9,6 +9,9 @@ namespace rest1.Repositories
     {
         Room getRoom(int roomNo, int usrNo);
         List<Room> getRoomList(int usrNo);
+        int getRoomNo();
+        void AddRoom(Room room);
+        void AddRoomUser(Room room);
     }
 
     public class RoomRepository : IRoomRepository
@@ -92,6 +95,49 @@ namespace rest1.Repositories
             });
 
             return roomlist.ToList<Room>();
+        }
+
+        public int getRoomNo()
+        {
+            string sql = @$"SELECT COALESCE(MAX(room_no),0)+1 as room_no
+                              FROM talk.room";
+            var dt = _db.ExecuteSelect(sql, new { });
+
+            var roomNo = 0;
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                roomNo = (int)(long)dt.Rows[0]["room_no"];
+            }
+            ;
+
+            return roomNo;
+        }
+
+        public void AddRoom(Room room)
+        {
+            string sql = @"INSERT INTO talk.room (ROOM_NO,USR_NO,TITLE,RGT_DTM) VALUES
+                           (@roomNo,@usrNo,@title,to_char(now(),'YYYYMMDDHH24MISS'))";
+            var param = new
+            {
+                roomNo = room.RoomNo,
+                usrNo =  room.UsrNo,
+                title =  room.Title,
+            };
+            int result = _db.ExecuteNonQuery(sql, param);
+        }
+
+        public void AddRoomUser(Room room)
+        {
+            string sql = @"INSERT INTO talk.roomuser (ROOM_NO,USR_NO,TITLE,CHAT_NO,DEL_YN) VALUES
+                           (@roomNo,@usrNo,(SELECT TITLE FROM talk.room where ROOM_NO = @roomNo),
+                            (SELECT coalesce(MAX(CHAT_NO),0) FROM talk.chat WHERE ROOM_NO = @roomNo),'N')";
+            var param = new 
+            {
+                roomNo = room.RoomNo,
+                usrNo = room.UsrNo,
+            };
+
+            int result = _db.ExecuteNonQuery(sql, param);
         }
     }
 }

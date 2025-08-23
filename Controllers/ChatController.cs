@@ -39,12 +39,12 @@ namespace rest1.Controllers
         [HttpPost("insert")]
         public async Task<IActionResult> insertChat([FromBody] RequestDto dto)
         {
-            var result = _chatService.InsertChat(dto.roomNo, dto.usrNo, dto.type, dto.msg);
+            var result = _chatService.InsertChat(dto.roomNo, dto.usrNo, dto.type, dto.meUsrNo, dto.msg);
             return Ok(result);
         }
 
         [HttpPost("insert1")]
-        public async Task<IActionResult> insert1Chat([FromForm] int roomNo, [FromForm] int usrNo, [FromForm] string type, [FromForm] IFormFile file)
+        public async Task<IActionResult> insert1Chat([FromForm] int roomNo, [FromForm] int usrNo, [FromForm] string type, [FromForm] int meUsrNo, [FromForm] IFormFile file)
         {
             var memoryStream = new MemoryStream();
             await file.CopyToAsync(memoryStream);
@@ -57,7 +57,7 @@ namespace rest1.Controllers
                 OriginName = file.FileName,
                 Buffer = memoryStream.ToArray(),
             };
-            var result = _chatService.InsertChat(roomNo, usrNo, type, f);
+            var result = _chatService.InsertChat(roomNo, usrNo, type, meUsrNo, f);
             return Ok(result);
         }
 
@@ -70,10 +70,10 @@ namespace rest1.Controllers
         }
 
         [HttpGet("invite/{roomNo}")]
-        public async Task<IActionResult> invite(int roomNo, [FromQuery] string usrNos, [FromQuery] string usrNms)
+        public async Task<IActionResult> invite(int roomNo, [FromQuery] string usrNos, [FromQuery] string usrNms, [FromQuery] int meNo, [FromQuery] string meNm)
         {
             List<int> usrNoList = usrNos.Split(",").Select(x => int.Parse(x)).ToList();
-            var result = _chatService.Invite(roomNo, usrNoList, usrNms);
+            var result = _chatService.Invite(roomNo, usrNoList, usrNms, meNo, meNm);
             return Ok(result);
         }
 
@@ -102,5 +102,6 @@ namespace rest1.Controllers
         public int usrNo { get; set; }
         public string type { get; set; }
         public string msg { get; set; }
+        public int meUsrNo { get; set; }
     }
 }

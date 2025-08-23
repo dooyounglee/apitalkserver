@@ -1,5 +1,6 @@
 ﻿using rest1.Repositories;
 using rest1.Models;
+using rest1.Attibutes;
 
 namespace rest1.Services
 {
@@ -7,15 +8,18 @@ namespace rest1.Services
     {
         Room getRoom(int roomNo, int usrNo);
         List<Room> getRoomList(int usrNo);
+        int createRoom(List<User> userList, User me);
     }
 
     public class RoomService : IRoomService
     {
         private readonly IRoomRepository _roomRepository;
+        private readonly IChatService _chatService;
 
-        public RoomService(IRoomRepository roomRepository)
+        public RoomService(IRoomRepository roomRepository, IChatService chatService)
         {
             _roomRepository = roomRepository;
+            _chatService = chatService;
         }
 
         public Room getRoom(int roomNo, int usrNo)
@@ -26,6 +30,49 @@ namespace rest1.Services
         public List<Room> getRoomList(int usrNo)
         {
             return _roomRepository.getRoomList(usrNo);
+        }
+
+        [Transaction]
+        public int createRoom(List<User> userList, User me)
+        {
+            int newRoomNo = _roomRepository.getRoomNo();
+            
+            string title = me.UsrNm;
+            foreach (User u in userList)
+            {
+                if (me.UsrNo != u.UsrNo)
+                {
+                    title += "," + u.UsrNm;
+                }
+            }
+            
+            userList.Add(me);
+
+            // 방만들기
+            _roomRepository.AddRoom(new Room()
+            {
+                RoomNo = newRoomNo,
+                UsrNo = me.UsrNo,
+                Title = title,
+            });
+            
+            // 방-유저 연결하기
+            foreach (User user in userList)
+            {
+                _roomRepository.AddRoomUser(new Room()
+                {
+                    RoomNo = newRoomNo,
+                    UsrNo = user.UsrNo,
+                    Title = title,
+                });
+            }
+
+            // 방만들었따는 채팅
+            _chatService.InsertChat(newRoomNo, me.UsrNo, "B", me.UsrNo, $"{me.UsrNm}님이 방을 만들었다");
+
+            throw new Exception("일부러");
+            
+            return newRoomNo;
         }
     }
 }

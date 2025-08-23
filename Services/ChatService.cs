@@ -13,14 +13,15 @@ namespace rest1.Services
     {
         //public Room getChat(int roomNo);
         // public List<Room> getChatList(int usrNo);
-        public int InsertChat(int roomNo, int usrNo, string type, string msg);
-        public int InsertChat(int roomNo, int usrNo, string type, Models.File file);
+        public int InsertChat(int roomNo, int usrNo, string type, int meUsrNo, string msg);
+        public int InsertChat(int roomNo, int usrNo, string type, int meUsrNo, Models.File file);
         //public List<Chat> SelectChats(int roomNo);
         public List<Chat> getChatList(int roomNo, int usrNo, int page);
         public int CountChats(int roomNo);
         //public int CreateRoom(List<User> userList);
+        [Obsolete]
         public string Invite(int roomNo, List<User> userList);
-        public string Invite(int roomNo, List<int> usrNos, string usrNms);
+        public string Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string moNm);
         //public string Leave(int roomNo, int usrNo);
         //public List<User> RoomUserList(int roomNo);
         //public int CountRoomWithMe(int usrNo);
@@ -58,21 +59,21 @@ namespace rest1.Services
             }
         }
 
-        public int InsertChat(int roomNo, int usrNo, string type, string msg)
+        public int InsertChat(int roomNo, int usrNo, string type, int meUsrNo, string msg)
         {
             int newChatNo = _chatRepository.getNewChatNo();
             _chatRepository.InsertChat(newChatNo, roomNo, usrNo, type, msg);
-            _chatRepository.InsertChatUserExceptMe(roomNo, _userService.Me.UsrNo, newChatNo);
+            _chatRepository.InsertChatUserExceptMe(roomNo, meUsrNo, newChatNo);
             return newChatNo;
         }
 
-        public int InsertChat(int roomNo, int usrNo, string type, Models.File file)
+        public int InsertChat(int roomNo, int usrNo, string type, int meUsrNo, Models.File file)
         {
             int fileNo = _fileService.saveFile(file);
 
             int newChatNo = _chatRepository.getNewChatNo();
             _chatRepository.InsertChat(newChatNo, roomNo, usrNo, type, file.OriginName, fileNo);
-            _chatRepository.InsertChatUserExceptMe(roomNo, _userService.Me.UsrNo, newChatNo);
+            _chatRepository.InsertChatUserExceptMe(roomNo, meUsrNo, newChatNo);
             return newChatNo;
         }
 
@@ -92,7 +93,7 @@ namespace rest1.Services
         //public int CreateRoom(List<User> userList)
         //{
         //    int newRoomNo = _chatRepository.GetRoomNo();
-            
+
         //    string title = _userService.Me.UsrNm;
         //    foreach (User u in userList)
         //    {
@@ -129,6 +130,7 @@ namespace rest1.Services
         //    return newRoomNo;
         //}
 
+        [Obsolete]
         public string Invite(int roomNo, List<User> userList)
         {
             string invitedUsers = string.Join(",", userList.Select(u => u.UsrNm));
@@ -146,11 +148,11 @@ namespace rest1.Services
 
             var msg = $"{_userService.Me.UsrNm}님이 {invitedUsers}님을 초대했다";
 
-            InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
+            // InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
 
             return msg;
         }
-        public string Invite(int roomNo, List<int> usrNos, string usrNms)
+        public string Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string meNm)
         {
             // 방-유저 연결하기
             foreach (int usrNo in usrNos)
@@ -159,13 +161,13 @@ namespace rest1.Services
                 {
                     RoomNo = roomNo,
                     UsrNo = usrNo,
-                    Title = $"{_userService.Me.UsrNm},{usrNms}",
+                    Title = $"{meNm},{usrNms}",
                 });
             }
 
-            var msg = $"{_userService.Me.UsrNm}님이 {usrNms}님을 초대했다";
+            var msg = $"{meNm}님이 {usrNms}님을 초대했다";
 
-            InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
+            InsertChat(roomNo, meNo, "C", meNo, msg);
 
             return msg;
         }

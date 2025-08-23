@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using OTILib.Util;
+using rest1.Attibutes;
+using rest1.Models;
 using rest1.Services;
 
 namespace rest1.Controllers
@@ -14,6 +17,7 @@ namespace rest1.Controllers
             _roomService = roomService;
         }
 
+        [Log]
         [HttpGet("list")]
         public async Task<IActionResult> getRoomList([FromQuery] int usrNo)
         {
@@ -27,5 +31,18 @@ namespace rest1.Controllers
             var room = _roomService.getRoom(roomNo, usrNo);
             return Ok(room);
         }
+
+        [HttpPost("create")]
+        public async Task<IActionResult> createRoom([FromBody] CreateRoomDto dto)
+        {
+            var roomNo = _roomService.createRoom(dto.userList, dto.me);
+            return Ok(roomNo);
+        }
+    }
+
+    public class CreateRoomDto
+    {
+        public List<User> userList { get; set; }
+        public User me { get; set; }
     }
 }
