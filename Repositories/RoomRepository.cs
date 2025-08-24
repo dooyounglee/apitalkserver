@@ -14,6 +14,8 @@ namespace rest1.Repositories
         void AddRoomUser(Room room);
         int UpdateTitle(int roomNo, int usrNo, string title);
         int LeaveRoom(int roomNo, int usrNo);
+        List<User> SelectRoomUserList(int roomNo);
+        int CountRoomWithMe(int myUsrNo, int usrNo);
     }
 
     public class RoomRepository : IRoomRepository
@@ -173,6 +175,70 @@ namespace rest1.Repositories
             };
 
             return _db.ExecuteNonQuery(sql, param);
+        }
+
+        public List<User> SelectRoomUserList(int roomNo)
+        {
+            string sql = @"SELECT b.usr_no
+                                 , b.usr_nm
+                              FROM talk.roomuser a
+                                 , talk.""user"" b
+                             where a.room_no = @roomNo
+                               and a.usr_no = b.usr_no
+                               and a.del_yn = 'N'
+                             order by usr_nm";
+            var param = new
+            {
+                roomNo = roomNo,
+            };
+
+            var dt = _db.ExecuteSelect(sql, param);
+
+            var userList = new List<User>();
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                userList.Add(new User()
+                {
+                    UsrNo = (int)(long)dt.Rows[i]["usr_no"],
+                    UsrNm = (string)dt.Rows[i]["usr_nm"],
+                });
+            }
+            ;
+
+            return userList;
+        }
+
+        public int CountRoomWithMe(int myUsrNo, int usrNo)
+        {
+            string sql = @"SELECT count(*) as cnt
+                              FROM (SELECT room_no
+                                         , count(*) as cnt
+                                      FROM talk.roomuser
+                                     WHERE DEL_YN = 'N'
+                                     GROUP BY room_no
+                                    HAVING count(*) = 2) A
+                                 , (SELECT room_no
+                                         , count(*) as cnt
+                                      FROM talk.roomuser
+                                     WHERE usr_no in (@myUsrNo,@usrNo)
+                                       AND DEL_YN = 'N'
+                                     GROUP BY room_no) B
+                             where A.room_no = B.room_no
+                               and A.cnt = B.cnt";
+            var param = new
+            {
+                myUsrNo = myUsrNo,
+                usrNo = usrNo,
+            };
+
+            var dt = _db.ExecuteSelect(sql, param);
+
+            int result = -1;
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                result = (int)(long)dt.Rows[i]["cnt"];
+            }
+            return result;
         }
     }
 }

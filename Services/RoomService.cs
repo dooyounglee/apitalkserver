@@ -11,6 +11,8 @@ namespace rest1.Services
         int createRoom(List<User> userList, User me);
         int EditTitle(int roomNo, int usrNo, string title);
         string Leave(int roomNo, int usrNo, string msg);
+        List<User> RoomUserList(int roomNo);
+        int CountRoomWithMe(int meNo, int usrNo);
     }
 
     public class RoomService : IRoomService
@@ -89,6 +91,16 @@ namespace rest1.Services
             _chatService.InsertChat(roomNo, usrNo, "D", usrNo, msg);
 
             return msg;
+        }
+
+        public List<User> RoomUserList(int roomNo)
+        {
+            return _roomRepository.SelectRoomUserList(roomNo);
+        }
+
+        public int CountRoomWithMe(int meNo, int usrNo)
+        {
+            return _roomRepository.CountRoomWithMe(meNo, usrNo);
         }
     }
 }

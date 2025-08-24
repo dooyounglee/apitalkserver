@@ -52,6 +52,20 @@ namespace rest1.Controllers
             var result = _roomService.Leave(dto.roomNo, dto.usrNo, dto.msg);
             return Ok(result);
         }
+
+        [HttpGet("users")]
+        public async Task<IActionResult> getUsers([FromQuery] int roomNo)
+        {
+            var result = _roomService.RoomUserList(roomNo);
+            return Ok(result);
+        }
+
+        [HttpGet("count")]
+        public async Task<IActionResult> getCount([FromQuery] int meNo, [FromQuery] int usrNo)
+        {
+            var result = _roomService.CountRoomWithMe(meNo, usrNo);
+            return Ok(result);
+        }
     }
 
     public class CreateRoomDto
