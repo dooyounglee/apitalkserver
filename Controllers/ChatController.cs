@@ -61,7 +61,7 @@ namespace rest1.Controllers
             return Ok(result);
         }
 
-        [HttpGet("isThereTheyinRoom")]
+        [HttpGet("isThereTheyinRoom/{roomNo}")]
         public async Task<IActionResult> isThereTheyinRoom(int roomNo, [FromQuery] string usrNos)
         {
             List<int> usrNoList = usrNos.Split(",").Select(x => int.Parse(x)).ToList();
