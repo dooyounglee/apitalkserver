@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using rest1.Attibutes;
+
 //using System.Windows.Interop;
 using rest1.Models;
 using rest1.Repositories;
@@ -48,6 +50,7 @@ namespace rest1.Services
         //    return _chatRepository.GetRoom(roomNo, _userService.Me.UsrNo);
         //}
 
+        [Transaction]
         public List<Chat> getChatList(int roomNo, int usrNo, int page)
         {
             if (page == 0)
@@ -59,6 +62,7 @@ namespace rest1.Services
             }
         }
 
+        [Transaction]
         public int InsertChat(int roomNo, int usrNo, string type, int meUsrNo, string msg)
         {
             int newChatNo = _chatRepository.getNewChatNo();
@@ -67,6 +71,7 @@ namespace rest1.Services
             return newChatNo;
         }
 
+        [Transaction]
         public int InsertChat(int roomNo, int usrNo, string type, int meUsrNo, Models.File file)
         {
             int fileNo = _fileService.saveFile(file);
@@ -85,6 +90,8 @@ namespace rest1.Services
         //{
         //    return _chatRepository.SelectChats(roomNo, _userService.Me.UsrNo, page);
         //}
+
+        [Transaction]
         public int CountChats(int roomNo)
         {
             return _chatRepository.CountChats(roomNo);
@@ -152,6 +159,7 @@ namespace rest1.Services
 
             return msg;
         }
+        [Transaction]
         public string Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string meNm)
         {
             // 방-유저 연결하기
@@ -193,6 +201,7 @@ namespace rest1.Services
         //    return _chatRepository.CountRoomWithMe(_userService.Me.UsrNo, usrNo);
         //}
 
+        [Transaction]
         public bool IsThereSomeoneinRoom(int roomNo, List<int> usrNos)
         {
             bool result = false;
@@ -213,6 +222,7 @@ namespace rest1.Services
         //    _chatRepository.UpdateTitle(roomNo, usrNo, title);
         //}
 
+        [Transaction]
         public int ReadChat(int roomNo, int usrNo)
         {
             return _chatRepository.ReadChat(roomNo, usrNo);

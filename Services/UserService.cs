@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using rest1.Attibutes;
 using rest1.Models;
 using rest1.Repositories;
 
@@ -30,6 +31,8 @@ namespace rest1.Services
         {
             _userRepository = userRepository;
         }
+
+        [Transaction]
         public User login(string id, string pw)
         {
             _user = _userRepository.login("user" + id, "");
@@ -39,11 +42,13 @@ namespace rest1.Services
             return _user;
         }
 
+        [Transaction]
         public List<User> getUserList()
         {
             return _userRepository.getUserList();
         }
 
+        [Transaction]
         public User getUser(int usrNo)
         {
             return _userRepository.findById(usrNo);
@@ -54,6 +59,7 @@ namespace rest1.Services
             _user = null;
         }
 
+        [Transaction]
         public void save(User user)
         {
             _userRepository.save(user);

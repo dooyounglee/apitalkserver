@@ -26,11 +26,13 @@ namespace rest1.Services
             _chatService = chatService;
         }
 
+        [Transaction]
         public Room getRoom(int roomNo, int usrNo)
         {
             return _roomRepository.getRoom(roomNo, usrNo);
         }
 
+        [Transaction]
         public List<Room> getRoomList(int usrNo)
         {
             return _roomRepository.getRoomList(usrNo);
@@ -79,11 +81,13 @@ namespace rest1.Services
             return newRoomNo;
         }
 
+        [Transaction]
         public int EditTitle(int roomNo, int usrNo, string title)
         {
             return _roomRepository.UpdateTitle(roomNo, usrNo, title);
         }
 
+        [Transaction]
         public string Leave(int roomNo, int usrNo, string msg)
         {
             _roomRepository.LeaveRoom(roomNo, usrNo);
@@ -93,11 +97,13 @@ namespace rest1.Services
             return msg;
         }
 
+        [Transaction]
         public List<User> RoomUserList(int roomNo)
         {
             return _roomRepository.SelectRoomUserList(roomNo);
         }
 
+        [Transaction]
         public int CountRoomWithMe(int meNo, int usrNo)
         {
             return _roomRepository.CountRoomWithMe(meNo, usrNo);
