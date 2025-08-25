@@ -14,6 +14,7 @@ namespace rest1.Repositories
     {
         int GetNewFileNo();
         int saveFile(Models.File file);
+        rest1.Models.File getFile(int fileNo);
     }
 
     public class FileRepository : IFileRepository
@@ -58,6 +59,37 @@ namespace rest1.Repositories
             };
 
             return _db.ExecuteNonQuery(sql, param);
+        }
+
+        public rest1.Models.File getFile(int fileNo)
+        {
+            string sql = @"SELECT file_no, file_path, file_name, file_ext, origin_name
+                             FROM talk.chatfile
+                            WHERE file_no = @fileNo";
+            var param = new
+            {
+                fileNo = fileNo,
+            };
+
+            var dt = _db.ExecuteSelect(sql, param);
+
+            var roomNo = 0;
+            for (var i = 0; i < dt.Rows.Count; i++)
+            {
+                roomNo = (int)(long)dt.Rows[0]["file_no"];
+            }
+            ;
+
+            var file = new rest1.Models.File()
+            {
+                FileNo = (int)(long)dt.Rows[0]["file_no"],
+                FilePath = (string)dt.Rows[0]["file_path"],
+                FileName = (string)dt.Rows[0]["file_name"],
+                FileExt = (string)dt.Rows[0]["file_ext"],
+                OriginName = (string)dt.Rows[0]["origin_name"],
+            };
+
+            return file;
         }
     }
 }
