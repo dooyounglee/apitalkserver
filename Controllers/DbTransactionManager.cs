@@ -10,6 +10,9 @@ namespace rest1.Controllers
         [ThreadStatic]
         private static NpgsqlConnection? _connection;
 
+        [ThreadStatic]
+        private static int _transactionDepth;
+
         private static string? _connStr;
 
         public static void Initialize(string connStr)
@@ -17,23 +20,42 @@ namespace rest1.Controllers
             _connStr = connStr;
         }
 
-        public static void Begin()
+        public static void Begin(bool requiresNew = false)
         {
-            _connection = new NpgsqlConnection(_connStr);
-            _connection.Open();
-            _currentTransaction = _connection.BeginTransaction();
+            if (requiresNew || _currentTransaction == null)
+            {
+                _connection = new NpgsqlConnection(_connStr);
+                _connection.Open();
+                _currentTransaction = _connection.BeginTransaction();
+                _transactionDepth = 1;
+            }
+            else
+            {
+                _transactionDepth++;
+            }
         }
 
         public static void Commit()
         {
-            _currentTransaction?.Commit();
-            _connection?.Close();
+            if (--_transactionDepth == 0)
+            {
+                _currentTransaction?.Commit();
+                _connection?.Close();
+                _currentTransaction = null;
+                _connection = null;
+            }
         }
 
         public static void Rollback()
         {
-            _currentTransaction?.Rollback();
-            _connection?.Close();
+            if (_transactionDepth > 0)
+            {
+                _currentTransaction?.Rollback();
+                _transactionDepth = 0;
+                _connection?.Close();
+                _currentTransaction = null;
+                _connection = null;
+            }
         }
 
         public static NpgsqlTransaction? Current => _currentTransaction;

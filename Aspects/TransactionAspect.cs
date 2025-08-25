@@ -1,6 +1,7 @@
 ﻿using AspectInjector.Broker;
 using OTILib.Util;
 using rest1.Controllers;
+using rest1.Attibutes;
 using System.Reflection;
 using System.Transactions;
 
@@ -15,26 +16,35 @@ namespace rest1.Aspects
             [Argument(Source.Arguments)] object[] args,
             [Argument(Source.Method)] MethodBase methodInfo)
         {
+            var attr = methodInfo.GetCustomAttribute<TransactionAttribute>();
+            var propagation = attr?.Propagation ?? TransactionPropagation.Required;
+            var requiresNew = propagation == TransactionPropagation.RequiresNew;
+
+            var isRootTransaction = DbTransactionManager.Current == null || requiresNew;
+
             try
             {
-                Console.WriteLine($"🔄 Begin Transaction - {methodInfo.Name}");
-                OtiLogger.log1($"🔄 Begin Transaction - {methodInfo.Name}");
-                DbTransactionManager.Begin();
+                if (isRootTransaction)
+                    OtiLogger.log1($"🔄 Begin Transaction - {methodInfo.Name}");
+                else
+                    OtiLogger.log1($"▶ Reusing Transaction - {methodInfo.Name}");
+
+                DbTransactionManager.Begin(requiresNew);
 
                 var result = method(args);
 
-                Console.WriteLine($"✅ Commit Transaction - {methodInfo.Name}");
-                OtiLogger.log1($"✅ Commit Transaction - {methodInfo.Name}");
                 DbTransactionManager.Commit();
+
+                if (isRootTransaction)
+                    OtiLogger.log1($"✅ Commit Transaction - {methodInfo.Name}");
 
                 return result;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Rollback Transaction - {methodInfo.Name} : {ex.Message}");
-                OtiLogger.log1($"❌ Rollback Transaction - {methodInfo.Name} : {ex.Message}");
                 DbTransactionManager.Rollback();
-                throw; // 예외 다시 던지기
+                OtiLogger.log1($"❌ Rollback Transaction - {methodInfo.Name} : {ex.Message}");
+                throw;
             }
         }
         // [Advice(Kind.Before, Targets = Target.Method)]
