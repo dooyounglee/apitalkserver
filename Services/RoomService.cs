@@ -42,7 +42,7 @@ namespace rest1.Services
         public int createRoom(List<User> userList, User me)
         {
             int newRoomNo = _roomRepository.getRoomNo();
-            
+
             string title = me.UsrNm;
             foreach (User u in userList)
             {
@@ -76,8 +76,6 @@ namespace rest1.Services
             // 방만들었따는 채팅
             _chatService.InsertChat(newRoomNo, me.UsrNo, "B", me.UsrNo, $"{me.UsrNm}님이 방을 만들었다");
 
-            throw new Exception("일부러");
-            
             return newRoomNo;
         }
 
