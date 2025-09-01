@@ -81,7 +81,7 @@ namespace rest1.Repositories
 
             var param = new Dictionary<string, object>
             {
-                { "usrNo", 1 },
+                { "usrNo", usrNo },
             };
 
             var dt = _db.ExecuteSelect(sql, param);
