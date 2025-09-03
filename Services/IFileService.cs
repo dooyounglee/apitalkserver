@@ -28,6 +28,14 @@ namespace rest1.Services
             int fileNo = _fileRepository.GetNewFileNo();
             file.FileNo = fileNo;
             _fileRepository.saveFile(file);
+
+            // 파일실물 생성
+            if (!System.IO.Directory.Exists(file.FilePath))
+            {
+                System.IO.Directory.CreateDirectory(file.FilePath);
+            }
+            System.IO.File.WriteAllBytes(file.FilePath + file.FileName, file.Buffer);
+
             return fileNo;
         }
 
