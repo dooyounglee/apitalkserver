@@ -122,6 +122,7 @@ namespace rest1.Repositories
                                  , a.chat
                                  , a.usr_no
                                  , a.chat_fg
+                                 , coalesce(a.file_no, 0) as file_no
                               FROM talk.chat a
                              where a.room_no = @roomNo
                                and a.chat_no > (select chat_no
@@ -151,6 +152,7 @@ namespace rest1.Repositories
                     UsrNo = (int)(long)dt.Rows[i]["usr_no"],
                     chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
                     ChatFg = (string)dt.Rows[i]["chat_fg"],
+                    FileNo = (int)(long)dt.Rows[i]["file_no"],
                 });
             }
             ;
