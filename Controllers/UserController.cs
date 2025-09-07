@@ -2,6 +2,7 @@
 using rest1.Models;
 using rest1.Services;
 using System.Text.Json.Serialization;
+using talkLib.Util;
 
 namespace rest1.Controllers
 {
@@ -43,6 +44,31 @@ namespace rest1.Controllers
             var user = _userService.login(dto.UsrId, dto.Password);
             return Ok(user);
         }
+
+        [HttpPost("profile")]
+        public async Task<IActionResult> postProfile([FromForm] int usrNo, [FromForm] IFormFile file)
+        {
+            var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream);
+
+            Models.File f = new Models.File
+            {
+                FilePath = $"D:/temp/{DateUtil.now("yyyyMMdd")}/",
+                FileName = $"OTI{DateUtil.now("yyyyMMddHHmmddfffffff")}_{NumberUtil.random(1, 999)}",
+                FileExt = Path.GetExtension(file.FileName),
+                OriginName = file.FileName,
+                Buffer = memoryStream.ToArray(),
+            };
+            _userService.saveProfile(usrNo, f);
+            return Ok();
+        }
+
+        [HttpDelete("profile")]
+        public async Task<IActionResult> deleteProfile([FromBody] UserProfileDeleteRequestDto dto)
+        {
+            _userService.deleteProfile(dto.UsrNo);
+            return Ok();
+        }
     }
 
     public class UserLoginRequestDto
@@ -51,5 +77,11 @@ namespace rest1.Controllers
         public String UsrId { get; set; }
         [JsonPropertyName("password")]
         public String Password { get; set; }
+    }
+
+    public class UserProfileDeleteRequestDto
+    {
+        [JsonPropertyName("usrNo")]
+        public int UsrNo { get; set; }
     }
 }

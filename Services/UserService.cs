@@ -19,17 +19,22 @@ namespace rest1.Services
         public User Me { get; }
         public void logout();
         public void save(User user);
+
+        public void saveProfile(int usrNo, Models.File file);
+        public void deleteProfile(int usrNo);
     }
 
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IFileService _fileService;
         private User _user;
         public User Me { get => _user; }
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IFileService fileService)
         {
             _userRepository = userRepository;
+            _fileService = fileService;
         }
 
         [Transaction]
@@ -63,6 +68,19 @@ namespace rest1.Services
         public void save(User user)
         {
             _userRepository.save(user);
+        }
+
+        [Transaction]
+        public void saveProfile(int usrNo, Models.File file)
+        {
+            int fileNo = _fileService.saveFile(file);
+            _userRepository.updateProfileNo(usrNo, fileNo);
+        }
+
+        [Transaction]
+        public void deleteProfile(int usrNo)
+        {
+            _userRepository.deleteProfile(usrNo);
         }
     }
 }

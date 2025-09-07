@@ -20,6 +20,8 @@ namespace rest1.Repositories
         public List<User> getUserList();
         public User findById(int usrNo);
         public int save(User user);
+        public int updateProfileNo(int usrNo, int fileNo);
+        public int deleteProfile(int usrNo);
     }
 
     public class UserRepository : IUserRepository
@@ -146,6 +148,25 @@ namespace rest1.Repositories
             };
 
             return _db.ExecuteNonQuery(sql, param);
+        }
+
+        public int updateProfileNo(int usrNo, int fileNo)
+        {
+            string sql = @"UPDATE talk.""user""
+                              SET profile_no = @fileNo
+                            WHERE usr_no = @usrNo";
+            var param = new
+            {
+                usrNo = usrNo,
+                fileNo = fileNo,
+            };
+
+            return _db.ExecuteNonQuery(sql, param);
+        }
+
+        public int deleteProfile(int usrNo)
+        {
+            return updateProfileNo(usrNo, 0);
         }
     }
 }
