@@ -21,6 +21,7 @@ namespace rest1.Models
         public string? Tel { get; set; }
         public string? Ip { get; set; }
         public int Port { get; set; }
+        public int ProfileNo { get; set; }
         // public ConnState ConnState { get; set; }
         public Boolean IsAdmin { get; set; } = false;
         // public string Layout
