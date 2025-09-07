@@ -106,6 +106,7 @@ namespace rest1.Repositories
                                  , a.usr_nm
                                  , a.div_no
                                  , b.div_nm
+                                 , coalesce(a.profile_no, 0) as profile_no
                               FROM talk.""user"" a
                                  , talk.div b
                              where a.div_no = b.div_no
@@ -128,6 +129,7 @@ namespace rest1.Repositories
                 UsrNm = Convert.ToString(dt.Rows[0]["usr_nm"]),
                 DivNo = Convert.ToInt16(dt.Rows[0]["div_no"]),
                 DivNm = Convert.ToString(dt.Rows[0]["div_nm"]),
+                ProfileNo = (int)(long)dt.Rows[0]["profile_no"],
             };
         }
 
