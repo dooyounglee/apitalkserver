@@ -35,8 +35,8 @@ namespace rest1.Controllers
         [HttpPost("create")]
         public async Task<IActionResult> createRoom([FromBody] CreateRoomDto dto)
         {
-            var roomNo = _roomService.createRoom(dto.userList, dto.me);
-            return Ok(roomNo);
+            var room = _roomService.createRoom(dto.userList, dto.me);
+            return Ok(room);
         }
 
         [HttpPut("title")]

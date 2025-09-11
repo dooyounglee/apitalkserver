@@ -8,7 +8,7 @@ namespace rest1.Services
     {
         Room getRoom(int roomNo, int usrNo);
         List<Room> getRoomList(int usrNo);
-        int createRoom(List<User> userList, User me);
+        Room createRoom(List<User> userList, User me);
         int EditTitle(int roomNo, int usrNo, string title);
         string Leave(int roomNo, int usrNo, string msg);
         List<User> RoomUserList(int roomNo);
@@ -39,7 +39,7 @@ namespace rest1.Services
         }
 
         [Transaction]
-        public int createRoom(List<User> userList, User me)
+        public Room createRoom(List<User> userList, User me)
         {
             int newRoomNo = _roomRepository.getRoomNo();
 
@@ -76,7 +76,9 @@ namespace rest1.Services
             // 방만들었따는 채팅
             _chatService.InsertChat(newRoomNo, me.UsrNo, "B", me.UsrNo, $"{me.UsrNm}님이 방을 만들었다");
 
-            return newRoomNo;
+            var newRoom = _roomRepository.getRoom(newRoomNo, me.UsrNo);
+            newRoom.Chat = $"{me.UsrNm}님이 방을 만들었다";
+            return newRoom;
         }
 
         [Transaction]
