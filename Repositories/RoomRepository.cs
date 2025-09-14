@@ -181,10 +181,13 @@ namespace rest1.Repositories
         {
             string sql = @"SELECT b.usr_no
                                  , b.usr_nm
+                                 , c.div_nm
                               FROM talk.roomuser a
                                  , talk.""user"" b
+                                 , talk.div c
                              where a.room_no = @roomNo
                                and a.usr_no = b.usr_no
+                               and b.div_no = c.div_no
                                and a.del_yn = 'N'
                              order by usr_nm";
             var param = new
@@ -201,6 +204,7 @@ namespace rest1.Repositories
                 {
                     UsrNo = (int)(long)dt.Rows[i]["usr_no"],
                     UsrNm = (string)dt.Rows[i]["usr_nm"],
+                    DivNm = (string)dt.Rows[i]["div_nm"],
                 });
             }
             ;
