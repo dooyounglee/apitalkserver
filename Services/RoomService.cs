@@ -43,6 +43,7 @@ namespace rest1.Services
         {
             int newRoomNo = _roomRepository.getRoomNo();
 
+            // 방제
             string title = me.UsrNm;
             foreach (User u in userList)
             {
@@ -51,7 +52,19 @@ namespace rest1.Services
                     title += "," + u.UsrNm;
                 }
             }
-            
+
+            // 메시지 누가 누구를 초대했다
+            string chat = "";
+            foreach (User u in userList)
+            {
+                if (me.UsrNo != u.UsrNo)
+                {
+                    chat += "," + u.UsrNm;
+                }
+            }
+            chat = chat.Substring(1);
+            chat = $"{me.UsrNm}님이 {chat}님을 초대했다";
+
             userList.Add(me);
 
             // 방만들기
@@ -74,10 +87,10 @@ namespace rest1.Services
             }
 
             // 방만들었따는 채팅
-            _chatService.InsertChat(newRoomNo, me.UsrNo, "B", me.UsrNo, $"{me.UsrNm}님이 방을 만들었다");
+            _chatService.InsertChat(newRoomNo, me.UsrNo, "B", me.UsrNo, chat);
 
             var newRoom = _roomRepository.getRoom(newRoomNo, me.UsrNo);
-            newRoom.Chat = $"{me.UsrNm}님이 방을 만들었다";
+            newRoom.Chat = chat;
             return newRoom;
         }
 
