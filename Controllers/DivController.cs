@@ -1,11 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using rest1.Services;
+using System.Text.Json.Serialization;
 using talkLib.Util;
 
 namespace rest1.Controllers
 {
     [ApiController]
-    [Route("api/v1/div")]
+    [Route("api/v1/div/")]
     public class DivController : Controller
     {
         private readonly IDivService _divService;
@@ -22,24 +23,35 @@ namespace rest1.Controllers
             return Ok(chatList);
         }
 
-        [HttpPost("")]
+        [HttpPost]
         public async Task<IActionResult> postInsertDiv([FromBody] DivRequestDto dto)
         {
-            var result = _divService.InsertDiv(dto.divNm);
+            _divService.InsertDiv(dto.DivNm);
+
+            var chatList = _divService.getDivList();
+            return Ok(chatList);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> putEditDiv([FromBody] DivRequestDto dto)
+        {
+            var result = _divService.EditDiv(dto.DivNo, dto.DivNm);
             return Ok(result);
         }
 
-        [HttpPut("")]
-        public async Task<IActionResult> putEditDiv([FromBody] DivRequestDto dto)
+        [HttpDelete]
+        public async Task<IActionResult> deleteDeleteDiv([FromBody] DivRequestDto dto)
         {
-            var result = _divService.EditDiv(dto.divNo, dto.divNm);
-            return Ok(result);
+            _divService.DeleteDiv(dto.DivNo);
+            return Ok();
         }
     }
 
     public class DivRequestDto
     {
-        public int divNo { get; set; }
-        public string divNm { get; set; }
+        [JsonPropertyName("divNo")]
+        public int DivNo { get; set; }
+        [JsonPropertyName("divNm")]
+        public string? DivNm { get; set; }
     }
 }

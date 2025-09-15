@@ -14,6 +14,7 @@ namespace rest1.Services
         public List<Div> getDivList();
         public int InsertDiv(string divNm);
         public int EditDiv(int divNo, string divNm);
+        public int DeleteDiv(int divNo);
     }
 
     public class DivService : IDivService
@@ -41,6 +42,12 @@ namespace rest1.Services
         public int EditDiv(int divNo, string divNm)
         {
             return _divRepository.EditDiv(divNo, divNm);
+        }
+
+        [Transaction]
+        public int DeleteDiv(int divNo)
+        {
+            return _divRepository.DeleteDiv(divNo);
         }
     }
 }
