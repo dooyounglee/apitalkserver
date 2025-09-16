@@ -39,9 +39,16 @@ namespace rest1.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> login([FromBody] UserLoginRequestDto dto)
+        public async Task<IActionResult> postLogin([FromBody] UserLoginRequestDto dto)
         {
             var user = _userService.login(dto.UsrId, dto.Password);
+            return Ok(user);
+        }
+
+        [HttpPut("login")]
+        public async Task<IActionResult> putLogin([FromBody] UserLoginRequestDto dto)
+        {
+            var user = _userService.login(dto.UsrId);
             return Ok(user);
         }
 
@@ -74,9 +81,9 @@ namespace rest1.Controllers
     public class UserLoginRequestDto
     {
         [JsonPropertyName("usrId")]
-        public String UsrId { get; set; }
+        public string UsrId { get; set; }
         [JsonPropertyName("password")]
-        public String Password { get; set; }
+        public string? Password { get; set; }
     }
 
     public class UserProfileDeleteRequestDto

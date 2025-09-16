@@ -12,6 +12,7 @@ namespace rest1.Services
 {
     public interface IUserService
     {
+        public User login(string id);
         public User login(string id, string pw);
         public List<User> getUserList();
         public User getUser(int usrNo);
@@ -38,13 +39,14 @@ namespace rest1.Services
         }
 
         [Transaction]
+        public User login(string id)
+        {
+            return _userRepository.login("user" + id);
+        }
+        [Transaction]
         public User login(string id, string pw)
         {
-            _user = _userRepository.login("user" + id, "");
-            _user.Ip = "127.0.0.1";
-            _user.Port = 8080;
-            if (_user.UsrNo == 0) _user.IsAdmin = true;
-            return _user;
+            return _userRepository.login("user" + id, "");
         }
 
         [Transaction]

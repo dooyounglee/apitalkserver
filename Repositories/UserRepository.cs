@@ -16,6 +16,7 @@ namespace rest1.Repositories
 {
     public interface IUserRepository
     {
+        User login(string usrId);
         User login(string usrId, string usrPw);
         public List<User> getUserList();
         public User findById(int usrNo);
@@ -33,6 +34,37 @@ namespace rest1.Repositories
             _db = db;
         }
 
+        public User login(string usrId)
+        {
+            string sql = @"SELECT a.usr_no
+                                 , a.usr_id
+                                 , a.usr_nm
+                                 , a.div_no
+                                 , b.div_nm
+                              FROM talk.""user"" a
+                                 , talk.div b
+                             where a.div_no = b.div_no
+                               and a.usr_id = @usrId"
+                         ;
+            var param = new
+            {
+                usrId = usrId,
+            };
+
+            var dt = _db.ExecuteSelect(sql, param);
+
+            // 없으면 null
+            if (dt.Rows.Count == 0) return null;
+
+            return new User()
+            {
+                UsrNo = Convert.ToInt16(dt.Rows[0]["usr_no"]),
+                UsrId = Convert.ToString(dt.Rows[0]["usr_id"]),
+                UsrNm = Convert.ToString(dt.Rows[0]["usr_nm"]),
+                DivNo = Convert.ToInt16(dt.Rows[0]["div_no"]),
+                DivNm = Convert.ToString(dt.Rows[0]["div_nm"]),
+            };
+        }
         public User login(string usrId, string usrPw)
         {
             string sql = @"SELECT a.usr_no
