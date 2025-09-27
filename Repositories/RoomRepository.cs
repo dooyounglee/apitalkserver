@@ -119,13 +119,12 @@ namespace rest1.Repositories
 
         public void AddRoom(Room room)
         {
-            string sql = @"INSERT INTO talk.room (ROOM_NO,USR_NO,TITLE,RGT_DTM) VALUES
-                           (@roomNo,@usrNo,@title,to_char(now(),'YYYYMMDDHH24MISS'))";
+            string sql = @"INSERT INTO talk.room (ROOM_NO,USR_NO,RGT_DTM) VALUES
+                           (@roomNo,@usrNo,to_char(now(),'YYYYMMDDHH24MISS'))";
             var param = new
             {
                 roomNo = room.RoomNo,
                 usrNo =  room.UsrNo,
-                title =  room.Title,
             };
             int result = _db.ExecuteNonQuery(sql, param);
         }
