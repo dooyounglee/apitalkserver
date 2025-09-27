@@ -81,6 +81,7 @@ namespace rest1.Repositories
                                  , a.usr_no
                                  , a.chat_fg
                                  , coalesce(a.file_no, 0) as file_no
+                                 , a.rgt_dtm
                               FROM talk.chat a
                              where a.room_no = @roomNo
                                and a.chat_no > (select chat_no
@@ -108,6 +109,7 @@ namespace rest1.Repositories
                     chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
                     ChatFg = (string)dt.Rows[i]["chat_fg"],
                     FileNo = (int)(long)dt.Rows[i]["file_no"],
+                    RgtDtm = (string)dt.Rows[i]["rgt_dtm"],
                 });
             };
 
@@ -123,6 +125,7 @@ namespace rest1.Repositories
                                  , a.usr_no
                                  , a.chat_fg
                                  , coalesce(a.file_no, 0) as file_no
+                                 , a.rgt_dtm
                               FROM talk.chat a
                              where a.room_no = @roomNo
                                and a.chat_no > (select chat_no
@@ -153,6 +156,7 @@ namespace rest1.Repositories
                     chat = dt.Rows[i].IsNull("chat") ? "" : (string)dt.Rows[i]["chat"],
                     ChatFg = (string)dt.Rows[i]["chat_fg"],
                     FileNo = (int)(long)dt.Rows[i]["file_no"],
+                    RgtDtm = (string)dt.Rows[i]["rgt_dtm"],
                 });
             }
             ;

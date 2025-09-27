@@ -19,11 +19,12 @@ namespace rest1.Models
         // public BitmapImage Image { get; set; }
 
         // public string isFile { get => FileNo > 0 || FileBuffer != null ? "Visible" : "Collapsed"; }
-        public string isFile { get; set; } = "Collapsed";
-        public string isImage { get; set; } = "Collapsed";
-        public string Layout
-        {
-            get => $"{UsrNo}: {chat}";
-        }
+        // public string isFile { get; set; } = "Collapsed";
+        // public string isImage { get; set; } = "Collapsed";
+        public string RgtDtm { get; set; }
+        // public string Layout
+        // {
+        //     get => $"{UsrNo}: {chat}";
+        // }
     }
 }
