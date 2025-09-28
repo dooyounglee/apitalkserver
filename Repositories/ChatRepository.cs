@@ -14,7 +14,7 @@ namespace rest1.Repositories
 {
     public interface IChatRepository
     {
-        //public Room GetRoom(int roomNo, int usrNo);
+        public Room GetRoom(int roomNo, int usrNo);
         public List<Chat>? getChatList(int roomNo, int usrNo);
         public List<Chat>? getChatList(int roomNo, int usrNo, int page);
         //public int GetRoomNo();
@@ -49,14 +49,12 @@ namespace rest1.Repositories
 
         public Room GetRoom(int roomNo, int usrNo)
         {
-            string sql = @"SELECT a.room_no
-                                 , b.title
-                              FROM talk.room a 
-                                 , talk.roomuser b
-                             where a.room_no = b.room_no
-                               and a.room_no = @roomNo
-                               and b.usr_no = @usrNo
-                               and b.del_yn = 'N'";
+            string sql = @"SELECT title
+                                , modify_yn
+                             FROM talk.roomuser
+                            where room_no = @roomNo
+                              and usr_no = @usrNo
+                              and del_yn = 'N'";
             var param = new
             {
                 roomNo = roomNo ,
@@ -67,8 +65,8 @@ namespace rest1.Repositories
 
             var roomlist = dt.AsEnumerable().Select(row => new Room()
             {
-                RoomNo = (int)(long)dt.Rows[0]["room_no"],
-                Title = (string)dt.Rows[0]["title"],
+                Title = (string)row["title"],
+                ModifyYn = (string)row["modify_yn"],
             });
 
             return roomlist.ToList<Room>()[0];
@@ -200,12 +198,13 @@ namespace rest1.Repositories
         public void AddRoomUser(Room room)
         {
             string sql = @"INSERT INTO talk.roomuser (ROOM_NO,USR_NO,TITLE,CHAT_NO,DEL_YN) VALUES
-                           (@roomNo,@usrNo,(SELECT TITLE FROM talk.room where ROOM_NO = @roomNo),
+                           (@roomNo,@usrNo,@title,
                             (SELECT coalesce(MAX(CHAT_NO),0) FROM talk.chat WHERE ROOM_NO = @roomNo),'N')";
-            var param = new Dictionary<string, object>
+            var param = new
             {
-                {"roomNo", room.RoomNo},
-                {"usrNo", room.UsrNo},
+                roomNo = room.RoomNo,
+                usrNo = room.UsrNo,
+                title = room.Title,
             };
 
             int result = _db.ExecuteNonQuery(sql, param);

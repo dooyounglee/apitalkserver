@@ -31,6 +31,7 @@ namespace rest1.Repositories
         {
             string sql = @"SELECT a.room_no
                                  , b.title
+                                 , b.modify_yn
                               FROM talk.room a 
                                  , talk.roomuser b
                              where a.room_no = b.room_no
@@ -49,6 +50,7 @@ namespace rest1.Repositories
             {
                 RoomNo = (int)(long)dt.Rows[0]["room_no"],
                 Title = (string)dt.Rows[0]["title"],
+                ModifyYn = (string)dt.Rows[0]["modify_yn"],
             });
 
             return roomlist.ToList<Room>()[0];
@@ -131,9 +133,9 @@ namespace rest1.Repositories
 
         public void AddRoomUser(Room room)
         {
-            string sql = @"INSERT INTO talk.roomuser (ROOM_NO,USR_NO,TITLE,CHAT_NO,DEL_YN) VALUES
-                           (@roomNo,@usrNo,(SELECT TITLE FROM talk.room where ROOM_NO = @roomNo),
-                            (SELECT coalesce(MAX(CHAT_NO),0) FROM talk.chat WHERE ROOM_NO = @roomNo),'N')";
+            string sql = @"INSERT INTO talk.roomuser (ROOM_NO,USR_NO,TITLE,CHAT_NO,DEL_YN,modify_yn) VALUES
+                           (@roomNo,@usrNo,@title,
+                            (SELECT coalesce(MAX(CHAT_NO),0) FROM talk.chat WHERE ROOM_NO = @roomNo),'N','N')";
             var param = new 
             {
                 roomNo = room.RoomNo,
@@ -147,6 +149,7 @@ namespace rest1.Repositories
         {
             string sql = @"UPDATE talk.roomuser
                                SET TITLE = @title
+                                 , modify_yn = 'Y'
                              WHERE ROOM_NO = @roomNo
                                AND USR_NO = @usrNo
                                AND DEL_YN = 'N'";

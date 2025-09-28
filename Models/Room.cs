@@ -14,11 +14,12 @@ namespace rest1.Models
         public string Chat { get; set; }
         public string RgtDtm { get; set; }
         public int CntUnread { get; set; }
-        public string ColorUnreadChat { get => CntUnread > 0 ? "skyblue" : "Black"; }
+        public string ModifyYn { get; set; }
+        // public string ColorUnreadChat { get => CntUnread > 0 ? "skyblue" : "Black"; }
 
-        public string Layout
-        {
-            get => $"{Title}" + (CntUnread > 0 ? $"[{CntUnread}]" : "") + $"\n{Chat} ({RgtDtm})";
-        }
+        // public string Layout
+        // {
+        //     get => $"{Title}" + (CntUnread > 0 ? $"[{CntUnread}]" : "") + $"\n{Chat} ({RgtDtm})";
+        // }
     }
 }

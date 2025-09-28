@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OTILib.Util;
 using rest1.Attibutes;
 
 //using System.Windows.Interop;
@@ -21,9 +22,8 @@ namespace rest1.Services
         public List<Chat> getChatList(int roomNo, int usrNo, int page);
         public int CountChats(int roomNo);
         //public int CreateRoom(List<User> userList);
-        [Obsolete]
-        public string Invite(int roomNo, List<User> userList);
-        public string Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string moNm);
+        //[Obsolete] public string Invite(int roomNo, List<User> userList);
+        public Room Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string moNm);
         //public string Leave(int roomNo, int usrNo);
         //public List<User> RoomUserList(int roomNo);
         //public int CountRoomWithMe(int usrNo);
@@ -35,13 +35,11 @@ namespace rest1.Services
     public class ChatService : IChatService
     {
         private readonly IChatRepository? _chatRepository;
-        private readonly IUserService _userService;
         private readonly IFileService _fileService;
 
-        public ChatService(IChatRepository? chatRepository, IUserService userService, IFileService fileService)
+        public ChatService(IChatRepository? chatRepository, IFileService fileService)
         {
             _chatRepository = chatRepository;
-            _userService = userService;
             _fileService = fileService;
         }
 
@@ -137,31 +135,43 @@ namespace rest1.Services
         //    return newRoomNo;
         //}
 
-        [Obsolete]
-        public string Invite(int roomNo, List<User> userList)
+        // [Obsolete]
+        // public string Invite(int roomNo, List<User> userList)
+        // {
+        //     string invitedUsers = string.Join(",", userList.Select(u => u.UsrNm));
+        // 
+        //     // 방-유저 연결하기
+        //     foreach (User user in userList)
+        //     {
+        //         _chatRepository.AddRoomUser(new Room()
+        //         {
+        //             RoomNo = roomNo,
+        //             UsrNo = user.UsrNo,
+        //             Title = $"{_userService.Me.UsrNm},{invitedUsers}",
+        //         });
+        //     }
+        // 
+        //     var msg = $"{_userService.Me.UsrNm}님이 {invitedUsers}님을 초대했다";
+        // 
+        //     // InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
+        // 
+        //     return msg;
+        // }
+        [Transaction]
+        public Room Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string meNm)
         {
-            string invitedUsers = string.Join(",", userList.Select(u => u.UsrNm));
-
-            // 방-유저 연결하기
-            foreach (User user in userList)
+            // 초대한사람 방제목 가져오기
+            string? title;
+            var room = _chatRepository.GetRoom(roomNo, meNo);
+            if (room.ModifyYn == "Y")
             {
-                _chatRepository.AddRoomUser(new Room()
-                {
-                    RoomNo = roomNo,
-                    UsrNo = user.UsrNo,
-                    Title = $"{_userService.Me.UsrNm},{invitedUsers}",
-                });
+                title = room.Title;
+            }
+            else
+            {
+                title = $"{room.Title},{usrNms}";
             }
 
-            var msg = $"{_userService.Me.UsrNm}님이 {invitedUsers}님을 초대했다";
-
-            // InsertChat(roomNo, _userService.Me.UsrNo, "C", msg);
-
-            return msg;
-        }
-        [Transaction]
-        public string Invite(int roomNo, List<int> usrNos, string usrNms, int meNo, string meNm)
-        {
             // 방-유저 연결하기
             foreach (int usrNo in usrNos)
             {
@@ -169,7 +179,7 @@ namespace rest1.Services
                 {
                     RoomNo = roomNo,
                     UsrNo = usrNo,
-                    Title = $"{meNm},{usrNms}",
+                    Title = title,
                 });
             }
 
@@ -177,7 +187,12 @@ namespace rest1.Services
 
             InsertChat(roomNo, meNo, "C", meNo, msg);
 
-            return msg;
+            return new Room()
+            {
+                RoomNo = roomNo,
+                Chat = msg,
+                Title = title,
+            };
         }
 
         //public string Leave(int roomNo, int usrNo)
