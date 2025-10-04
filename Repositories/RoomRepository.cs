@@ -140,6 +140,7 @@ namespace rest1.Repositories
             {
                 roomNo = room.RoomNo,
                 usrNo = room.UsrNo,
+                title = room.Title,
             };
 
             int result = _db.ExecuteNonQuery(sql, param);
